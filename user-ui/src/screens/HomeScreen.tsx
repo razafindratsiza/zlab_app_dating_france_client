@@ -1,9 +1,12 @@
 import React from 'react'
 import Header from '../components/Layout/Header'
-
-const  HomeScreen = ()=> {
+import Login from './Login'
+const HomeScreen = () => {
   return (
-   <div>HomeScreen</div>
+    <>
+      <Header />
+      <Login />
+    </>
   )
 }
 
