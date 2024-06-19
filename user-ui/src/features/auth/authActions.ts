@@ -1,9 +1,30 @@
 import { LoginSchema } from '@/screens/Login';
 import { createAsyncThunk } from '@reduxjs/toolkit';
-
+import Cookies from 'js-cookie';
+import { toast } from 'react-toastify';
 interface LoginCredentials {
   email: string;
   password: string;
+}
+
+
+interface User {
+  fullname: string;
+  id: string;
+  username: string;
+}
+
+interface LoginResponse {
+  data: {
+    Login: {
+      user: User;
+      accessToken: string;
+      refreshToken: string;
+      error?: {
+        message: string;
+      };
+    };
+  };
 }
 
 export const userLogin = createAsyncThunk<
@@ -16,9 +37,45 @@ export const userLogin = createAsyncThunk<
   'auth/login',
   async ({ email, password }, { rejectWithValue }) => {
     try {
-      // Simuler une requête API
-      console.log(email, password);
-      // Simulez la réponse de l'API ici
+      const response = await fetch(`${process.env.NEXT_PUBLIC_SERVER_URI}`, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+          query: `
+            mutation {
+              Login(email: "${email}", password: "${password}") {
+                user {
+                  fullname
+      id,
+      username,
+      email,
+      birthDay
+      birthYear,
+      birthMonth
+                }
+                accessToken
+                refreshToken
+                error {
+                  message
+                }
+              }
+            }
+          `,
+        }),
+      });
+
+      const result: LoginResponse = await response.json();
+
+      if (result.data.Login.error) {
+        toast.error(result.data.Login.error.message)
+      }
+
+      Cookies.set('access_token', result.data.Login.accessToken)
+      Cookies.set('refresh_token', result.data.Login.refreshToken)
+
+
     } catch (error: any) {
       return rejectWithValue(error.message);
     }

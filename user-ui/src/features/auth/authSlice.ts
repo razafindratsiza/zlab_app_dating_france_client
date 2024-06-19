@@ -19,7 +19,7 @@ interface UserInfo {
 }
 
 // Récupérer le token depuis le session storage
-const token = JSON.parse(sessionStorage.getItem('token') || 'null');
+const token = null
 const userToken: string | null = token;
 
 const initialState: AuthState = {
